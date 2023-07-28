@@ -1,0 +1,40 @@
+<h1>日報生成</h1>
+<form>
+  <textarea id="input"></textarea>
+  <button id="run" type="button">作成</button>
+  <textarea id="output"></textarea>
+</form>
+<script>
+  window.addEventListener('load', e => {
+    const input = document.getElementById('input')
+    const run = document.getElementById('run')
+    const output = document.getElementById('output')
+    run.addEventListener('click', e => {
+      const map = {}
+      output.value = input.value.split("\n").filter(i => i.trim()).reduce((a, i) => {
+        const [timePair, task, ...tail] = i.split(' ')
+        const [start, end] = timePair.split('-')
+        const startPair = start.split(':')
+        const startDay = startPair[0] < 24 ? 1 : 2
+        const startDate = new Date(`2000/1/${startDay} ${startPair[0] - (startDay - 1) * 24}:${startPair[1]}`)
+        const endPair = end.split(':')
+        const endDay = endPair[0] < 24 ? 1 : 2
+        const endDate = new Date(`2000/1/${endDay} ${endPair[0] - (endDay - 1) * 24}:${endPair[1]}`)
+        const span = (endDate - startDate) / 1000 / 60
+        map[task] ||= 0
+        map[task] += span
+        return a + (a ? "\n" : '') + `${timePair} (${span}) ${task} ${tail.join(' ')}`
+      }, '') + "\n" + Object.entries(map).reduce((a, i) => a + "\n" + `${i[0]} ${i[1]} (${(i[1] / 60).toFixed(2)}h)`, '')
+    })
+  })
+</script>
+<style>
+  textarea {
+    width: 100%;
+    height: calc(50% - 5rem);
+  }
+  #run {
+    width: calc(100% - 2rem);
+    margin: 1rem;
+  }
+</style>
