@@ -1,0 +1,58 @@
+<dl>
+  <dt>コンピューター</dt>
+  <dd id="computer">
+    <a>✋</a>
+    <a>👊</a>
+    <a>✌️</a>
+  </dd>
+  <dt>あなた</dt>
+  <dd id="you">
+    <a>✋</a>
+    <a>👊</a>
+    <a>✌️</a>
+  </dd>
+</dl>
+<p id="result"></p>
+<button id="redo">もういちど</button>
+<script>
+  window.addEventListener('load', e => {
+    const computer = document.getElementById('computer')
+    const you = document.getElementById('you')
+    const computerHands = Array.from(computer.children)
+    const yourHands = Array.from(you.children)
+    const result = document.getElementById('result')
+    const redo = document.getElementById('redo')
+    let computerHand
+    const timer = setInterval(() => {
+      computerHand = Math.floor(Math.random() * computerHands.length)
+      computerHands.forEach((element, i) => {
+        element.style.display = i === computerHand ? 'inline-block' : 'none'
+      });
+    }, 10)
+    yourHands.forEach(element => element.addEventListener('click', e => {
+      const yourHand = yourHands.indexOf(e.target)
+      yourHands.forEach((element, i) => {
+        element.style.display = yourHand === i ? 'inline-block' : 'none'
+      })
+      clearInterval(timer);
+      const won = (yourHand + 1) % yourHands.length === computerHand
+      result.textContent = yourHand === computerHand ? 'あいこです。' : `あなたの${won ? 'かち' : 'まけ'}です。`
+      redo.style.display = 'inline-block'
+    }))
+    redo.addEventListener('click', e => location.reload())
+  })
+</script>
+<style>
+  body {
+    text-align: center;
+  }
+  a {
+    font-size: 30vmin;
+  }
+  #you a {
+    cursor: pointer;
+  }
+  button {
+    display: none;
+  }
+</style>
