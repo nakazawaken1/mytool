@@ -1,0 +1,61 @@
+<div id="title">
+  <h1>フルーツあつめ</h1>
+  <ol id="items">
+  </ol>
+  <p>なにかキーをおせばスタート</p> 
+</div>
+
+<style>
+  #title {
+    text-align: center;
+  }
+  #title ol {
+    width: 30vmin;
+    list-style-type: none;
+    display: flex;
+    gap: 4vmin;
+    justify-content: space-around;
+  }
+  ol, table {
+    margin: 0 auto;
+  }
+  li {
+    font-size: 8vmin;
+  }
+  @keyframes disappearing {
+    100% {
+      opacity: 0;
+    }
+  }
+  #title.disappearing {
+    animation: disappearing 1s ease forwards;
+  }
+  @keyframes rotation {
+    50% {
+      transform: rotate(350deg) scale(1.2);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  #title ol li {
+    animation: rotation 2s ease infinite;
+  }
+</style>
+
+<script>
+window.addEventListener('load', e => {
+  const title = document.getElementById('title')
+
+  const ITEMS = ['', '🍎', '🍌', '🍇', '🥝']
+  const items = document.getElementById('items')
+  ITEMS.forEach(i => i ? items.appendChild(document.createElement('li')).textContent = i : void 0)
+
+  window.addEventListener('keydown', e => {
+    title.style.animation = 'disappearing 1s ease forwards'
+    title.addEventListener('animationend', e => {
+      title.style.display = 'none'
+    })
+  })
+})
+</script>
