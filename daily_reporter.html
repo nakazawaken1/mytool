@@ -13,6 +13,10 @@
       const map = {}
       output.value = input.value.split("\n").filter(i => i.trim()).reduce((a, i) => {
         const [timePair, task, ...tail] = i.split(' ')
+        if (!task) {
+          const items = timePair.split('/')
+          return a + (a ? "\n" : '') + (d => `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}(${'日月火水木金土'.charAt(d.getDay())})`)(new Date(items.length > 2 ? timePair : new Date().getFullYear() + '/' + timePair))
+        }
         const [start, end] = timePair.split('-')
         const startPair = start.split(':')
         const startDay = startPair[0] < 24 ? 1 : 2
@@ -24,7 +28,9 @@
         map[task] ||= 0
         map[task] += span
         return a + (a ? "\n" : '') + `${timePair} (${span}) ${task} ${tail.join(' ')}`
-      }, '') + "\n" + Object.entries(map).reduce((a, i) => a + "\n" + `${i[0]} ${i[1]} (${(i[1] / 60).toFixed(2)}h)`, '')
+      }, '')
+      + "\n" + Object.entries(map).reduce((a, i) => a + "\n" + `${i[0]} ${i[1]} (${(i[1] / 60).toFixed(2)}h)`, '')
+      + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
     })
   })
 </script>
