@@ -2,12 +2,22 @@
   <h1>フルーツあつめ</h1>
   <ol id="items">
   </ol>
+  <center>🧺</center>
   <p>なにかキーをおせばスタート</p> 
+</div>
+<div id="stage">
+  <table id="table"></table>
 </div>
 
 <style>
   #title {
     text-align: center;
+  }
+  center {
+    font-size: 20vmin;
+  }
+  #stage {
+    display: none;
   }
   #title ol {
     width: 30vmin;
@@ -19,7 +29,7 @@
   ol, table {
     margin: 0 auto;
   }
-  li {
+  li, td {
     font-size: 8vmin;
   }
   @keyframes disappearing {
@@ -46,15 +56,26 @@
 <script>
 window.addEventListener('load', e => {
   const title = document.getElementById('title')
+  const stage = document.getElementById('stage')
+  const table = document.getElementById('table')
 
   const ITEMS = ['', '🍎', '🍌', '🍇', '🥝']
   const items = document.getElementById('items')
   ITEMS.forEach(i => i ? items.appendChild(document.createElement('li')).textContent = i : void 0)
 
+  const COLUMNS = 4, ROWS = 4
+  const grid = Array.from(new Array(ROWS)).map(() => Array.from(new Array(COLUMNS)).map(() => Math.floor(Math.random() * 5)))
+  const position = [Math.floor((COLUMNS - 2) / 2), 0]
+  const draw = () => {
+    table.innerHTML = grid.reduce((a, i) => a + `<tr>${i.reduce((b, j) => b + `<td>${ITEMS[j]}</td>`, '')}</tr>`, '')
+  }
+  draw()
+  console.dir(grid)
   window.addEventListener('keydown', e => {
     title.style.animation = 'disappearing 1s ease forwards'
     title.addEventListener('animationend', e => {
       title.style.display = 'none'
+      stage.style.display = 'block'
     })
   })
 })

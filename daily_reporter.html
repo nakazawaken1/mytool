@@ -21,28 +21,28 @@
       const items = input.split("\n").filter(i => i.trim()).map(i => {
         const [timePair, task, ...tail] = i.split(' ').filter(i => i.trim())
         if (!task) {
-          const items = timePair.split('/')
-          date = (d => `${d.getFullYear()}/${('00' + (d.getMonth() + 1)).slice(-2)}/${('00' + d.getDate()).slice(-2)}(${'日月火水木金土'.charAt(d.getDay())})`)(new Date(items.length > 2 ? timePair : new Date().getFullYear() + '/' + timePair))
-          return { date }
+          date = new Date(timePair.includes('/') ? timePair : new Date().getFullYear() + '/' + timePair)
+          text = `${date.getFullYear()}/${('00' + (date.getMonth() + 1)).slice(-2)}/${('00' + date.getDate()).slice(-2)}(${'日月火水木金土'.charAt(date.getDay())})`
+          return { date, text }
         }
         const [start, end] = timePair.split('-')
         return { start, end, task, tail }
       })
       output.value = items.map((i, index) => {
-        if (i.date) return i.date
+        if (i.date) return i.text
         const prevItem = items[index - 1]
         const nextItem = items[index + 1]
         const startPair = (i.start ? i.start : prevItem.end).split(':')
         const startDay = startPair[0] < 24 ? 1 : 2
-        const startDate = new Date(`2000/1/${startDay} ${startPair[0] - (startDay - 1) * 24}:${startPair[1]}`)
+        const startDate = new Date(`${date.toISOString().slice(0, 8)}${startDay} ${startPair[0] - (startDay - 1) * 24}:${startPair[1]}`)
         const endPair = (i.end ? i.end : nextItem.start).split(':')
         const endDay = endPair[0] < 24 ? 1 : 2
-        const endDate = new Date(`2000/1/${endDay} ${endPair[0] - (endDay - 1) * 24}:${endPair[1]}`)
+        const endDate = new Date(`${date.toISOString().slice(0, 8)}${endDay} ${endPair[0] - (endDay - 1) * 24}:${endPair[1]}`)
         const span = (endDate.getTime() - startDate.getTime()) / 1000 / 60
         map[i.task] ||= 0
-        map[i.task] += i.span
+        map[i.task] += span
         urlMap[i.task] = i.tail.at(-1)
-        return `${startDate.toISOString().slice(0, 16).replace('T', '')}-${endDate.toISOString().slice(0, 16).replace('T', '')} (${i.span}) ${i.task} ${i.tail.join(' ')}`
+        return `${startDate.toISOString().slice(0, 16).replace('T', ' ')}-${endDate.toISOString().slice(0, 16).replace('T', ' ')} (${span}) ${i.task} ${i.tail.join(' ')}`
       }).join('\n')
         + "\n\n" + Object.entries(map).sort((a, b) => urlMap[a[0]] ? -1 : urlMap[b[0]] ? 1 : 2).reduce((a, i) => a + "\n" + `${date.split('(')[0]}\t${name.value}\t${urlMap[i[0]]}\t\t\t\t\t\t\t${others.includes(urlMap[i[0]]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${i[0]}(${i[1]})`, '')
         + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
