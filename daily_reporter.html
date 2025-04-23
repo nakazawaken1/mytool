@@ -11,23 +11,23 @@
     const input = document.getElementById('input')
     const run = document.getElementById('run')
     const output = document.getElementById('output')
-    const others = {'/1201371485257684':'個人宛メール/asana対応', '/1201371484735148':'MTG'}
+    const others = { '/1201371485257684': '個人宛メール/asana対応', '/1201371484735148': 'MTG' }
     const otherKeys = Object.keys(others)
-    input.addEventListener('paste', e => parse(e.clipboardData.getData('text/plain')))
+    input.addEventListener('paste', e => setTimeout(() => input.value, 0))
     run.addEventListener('click', e => parse(input.value))
+
     function parse(input) {
       let currentDate
       const map = {}
-      const urlMap = {}
       const items = input.split("\n").filter(i => i.trim()).map(i => {
-        const [timePair, task, ...tail] = i.split(' ').filter(i => i.trim())
-        if (!task) {
+        const [timePair, url, ...tail] = i.split(' ').filter(i => i.trim())
+        if (!url) {
           const date = new Date(timePair.includes('/') ? timePair : new Date().getFullYear() + '/' + timePair)
           const text = `${date.getFullYear()}/${('00' + (date.getMonth() + 1)).slice(-2)}/${('00' + date.getDate()).slice(-2)}(${'日月火水木金土'.charAt(date.getDay())})`
           return currentDate = { date, text }
         }
         const [start, end] = timePair.split('-')
-        return { start, end, task, tail }
+        return { start, end, url, tail }
       })
       output.value = items.map((i, index) => {
         if (i.date) return i.text
@@ -36,13 +36,11 @@
         const startDate = buildDate(i.start ? i.start : prevItem.end)
         const endDate = buildDate(i.end ? i.end : nextItem.start)
         const span = (endDate.getTime() - startDate.getTime()) / 1000 / 60
-        const task = otherName(i.task) || i.task
-        map[task] ||= 0
-        map[task] += span
-        urlMap[task] = i.tail.at(-1)
-        return `${startDate.toISOString()}-${endDate.toISOString()} (${span}) ${task} ${i.tail.join(' ')}`
+        map[i.url] ||= 0
+        map[i.url] += span
+        return `${startDate.toISOString()}-${endDate.toISOString()} (${span}) ${i.url} ${i.tail.join(' ')}`
       }).join('\n')
-        + "\n\n" + Object.entries(map).sort((a, b) => urlMap[a[0]] ? -1 : urlMap[b[0]] ? 1 : 2).reduce((a, i) => a + "\n" + `${currentDate.text.split('(')[0]}\t${name.value}\t${urlMap[i[0]]}\t\t\t\t\t\t\t${otherName(urlMap[i[0]]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${i[0]}(${i[1]})`, '')
+        + "\n\n" + Object.entries(map).sort((a, b) => a[0] ? -1 : b[0] ? 1 : 2).reduce((a, i) => a + "\n" + `${currentDate.text.split('(')[0]}\t${name.value}\t${i[0]}\t\t\t\t\t\t\t${otherName(i[0]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${otherName(i[0]) || i[0]}(${i[1]})`, '')
         + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
 
       function buildDate(hm) {
@@ -55,6 +53,7 @@
         date.setMinutes(pair[1])
         return date
       }
+
       function otherName(url) {
         return Object.entries(others).find(i => url?.includes(i[0]))?.[1] ?? ''
       }
