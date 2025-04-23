@@ -55,7 +55,7 @@
         return date
       }
       function otherName(url) {
-        return Object.entries(others).find(i => url.includes(i[0]))?.[1] ?? ''
+        return Object.entries(others).find(i => url?.includes(i[0]))?.[1] ?? ''
       }
     }
   })
