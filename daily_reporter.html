@@ -36,8 +36,10 @@
         const startDate = buildDate(i.start ? i.start : prevItem.end)
         const endDate = buildDate(i.end ? i.end : nextItem.start)
         const span = (endDate.getTime() - startDate.getTime()) / 1000 / 60
-        map[i.url] ||= 0
-        map[i.url] += span
+        if(url.startsWith('http')) {
+          map[i.url] ||= 0
+          map[i.url] += span
+        }
         return `${startDate.toISOString()}-${endDate.toISOString()} (${span}) ${i.url} ${i.tail.join(' ')}`
       }).join('\n')
         + "\n\n" + Object.entries(map).sort((a, b) => a[0] ? -1 : b[0] ? 1 : 2).reduce((a, i) => a + "\n" + `${currentDate.text.split('(')[0]}\t${name.value}\t${i[0]}\t\t\t\t\t\t\t${otherName(i[0]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${otherName(i[0]) || i[0]}(${i[1]})`, '')
