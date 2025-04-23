@@ -24,7 +24,7 @@
         if(!i.trim()) return null
         const [timePair, url, ...tail] = i.split(' ').filter(i => i.trim())
         if (!url) {
-          const date = new Date((timePair.split('/').length >= 2 ? timePair : new Date().getFullYear() + '/' + timePair) + ' 00:00:00+0900')
+          const date = new Date((timePair.split('/').length >= 3 ? timePair : new Date().getFullYear() + '/' + timePair) + ' 00:00:00+0900')
           currentDate = date
           return null
         }
