@@ -36,7 +36,7 @@
         const startDate = buildDate(i.start ? i.start : prevItem.end)
         const endDate = buildDate(i.end ? i.end : nextItem.start)
         const span = (endDate.getTime() - startDate.getTime()) / 1000 / 60
-        if(url.startsWith('http')) {
+        if(i.url.startsWith('http')) {
           map[i.url] ||= 0
           map[i.url] += span
         }
