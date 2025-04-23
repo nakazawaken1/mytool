@@ -13,7 +13,7 @@
     const output = document.getElementById('output')
     const others = { '/1201371485257684': '個人宛メール/asana対応', '/1201371484735148': 'MTG' }
     const otherKeys = Object.keys(others)
-    input.addEventListener('paste', e => setTimeout(() => input.value, 0))
+    input.addEventListener('paste', e => setTimeout(() => parse(input.value), 0))
     run.addEventListener('click', e => parse(input.value))
 
     function parse(input) {
@@ -23,7 +23,7 @@
       const items = input.split("\n").filter(i => i.trim()).map(i => {
         const [timePair, url, ...tail] = i.split(' ').filter(i => i.trim())
         if (!url) {
-          const date = new Date(timePair.includes('/') ? timePair : new Date().getFullYear() + '/' + timePair)
+          const date = new Date((timePair.split('/').length >= 2 ? timePair : new Date().getFullYear() + '/' + timePair) + ' 00:00:00+0900')
           const text = `${date.getFullYear()}/${('00' + (date.getMonth() + 1)).slice(-2)}/${('00' + date.getDate()).slice(-2)}(${'日月火水木金土'.charAt(date.getDay())})`
           return currentDate = { date, text }
         }
