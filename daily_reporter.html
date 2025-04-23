@@ -1,6 +1,6 @@
 <h1>日報生成</h1>
 <form>
-  <input id="name" value="Kenichi NAKAZAWA"/>
+  <input id="name" value="Kenichi NAKAZAWA" />
   <textarea id="input"></textarea>
   <button id="run" type="button">作成</button>
   <textarea id="output"></textarea>
@@ -13,7 +13,9 @@
     const output = document.getElementById('output')
     let date = ''
     const others = ['https://app.asana.com/0/1200929442372428/1201371485257684/f', 'https://app.asana.com/0/1200929442372428/1201371484735148/f']
-    run.addEventListener('click', e => {
+    input.addEventListener('paste', parse)
+    run.addEventListener('click', parse)
+    function parse(e) {
       const map = {}
       const urlMap = {}
       const items = input.value.split("\n").filter(i => i.trim()).map(i => {
@@ -21,10 +23,10 @@
         if (!task) {
           const items = timePair.split('/')
           date = (d => `${d.getFullYear()}/${('00' + (d.getMonth() + 1)).slice(-2)}/${('00' + d.getDate()).slice(-2)}(${'日月火水木金土'.charAt(d.getDay())})`)(new Date(items.length > 2 ? timePair : new Date().getFullYear() + '/' + timePair))
-          return {date}
+          return { date }
         }
         const [start, end] = timePair.split('-')
-        return {start, end, task, tail}
+        return { start, end, task, tail }
       })
       output.value = items.map((i, index) => {
         if (i.date) return i.date
@@ -42,9 +44,9 @@
         urlMap[i.task] = i.tail.at(-1)
         return `${startDate}-${endDate} (${i.span}) ${i.task} ${i.tail.join(' ')}`
       }).join('\n')
-      + "\n\n" + Object.entries(map).sort((a, b) => urlMap[a[0]] ? -1 : urlMap[b[0]] ? 1 : 2).reduce((a, i) => a + "\n" + `${date.split('(')[0]}\t${name.value}\t${urlMap[i[0]]}\t\t\t\t\t\t\t${others.includes(urlMap[i[0]]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${i[0]}(${i[1]})`, '')
-      + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
-    })
+        + "\n\n" + Object.entries(map).sort((a, b) => urlMap[a[0]] ? -1 : urlMap[b[0]] ? 1 : 2).reduce((a, i) => a + "\n" + `${date.split('(')[0]}\t${name.value}\t${urlMap[i[0]]}\t\t\t\t\t\t\t${others.includes(urlMap[i[0]]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${i[0]}(${i[1]})`, '')
+        + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
+    }
   })
 </script>
 <style>
@@ -52,6 +54,7 @@
     width: 100%;
     height: calc(50% - 5rem);
   }
+
   #run {
     width: calc(100% - 2rem);
     margin: 1rem;
