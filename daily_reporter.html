@@ -11,14 +11,14 @@
     const input = document.getElementById('input')
     const run = document.getElementById('run')
     const output = document.getElementById('output')
-    let date = ''
-    const others = ['https://app.asana.com/0/1200929442372428/1201371485257684/f', 'https://app.asana.com/0/1200929442372428/1201371484735148/f']
-    input.addEventListener('paste', parse)
-    run.addEventListener('click', parse)
-    function parse(e) {
+    const others = ['/1201371485257684', '/1201371484735148']
+    input.addEventListener('paste', e => parse(e.clipboardData.getData('text/plain')))
+    run.addEventListener('click', e => parse(input.value))
+    function parse(input) {
+      let date = ''
       const map = {}
       const urlMap = {}
-      const items = input.value.split("\n").filter(i => i.trim()).map(i => {
+      const items = input.split("\n").filter(i => i.trim()).map(i => {
         const [timePair, task, ...tail] = i.split(' ').filter(i => i.trim())
         if (!task) {
           const items = timePair.split('/')
@@ -42,7 +42,7 @@
         map[i.task] ||= 0
         map[i.task] += i.span
         urlMap[i.task] = i.tail.at(-1)
-        return `${startDate.toISOString().slice(0, 16).replace('T', '')}-${endDate.slice(0, 16).replace('T', '')} (${i.span}) ${i.task} ${i.tail.join(' ')}`
+        return `${startDate.toISOString().slice(0, 16).replace('T', '')}-${endDate.toISOString().slice(0, 16).replace('T', '')} (${i.span}) ${i.task} ${i.tail.join(' ')}`
       }).join('\n')
         + "\n\n" + Object.entries(map).sort((a, b) => urlMap[a[0]] ? -1 : urlMap[b[0]] ? 1 : 2).reduce((a, i) => a + "\n" + `${date.split('(')[0]}\t${name.value}\t${urlMap[i[0]]}\t\t\t\t\t\t\t${others.includes(urlMap[i[0]]) ? 'Others' : 'Implementation'}\t${(i[1] / 60).toFixed(2)}\t${i[0]}(${i[1]})`, '')
         + "\n\n" + (n => `計 ${n}(${(n / 60).toFixed(2)}h)`)(Object.entries(map).reduce((a, i) => a + Number(i[1]), 0))
